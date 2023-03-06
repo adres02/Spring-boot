@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+        integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="col-lg col-xl mt-3">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="bi bi-globe"></i> Browse User</h6>
+
+                    <a href="/tambah" class="btn btn-secondary">
+                        <i class="bi bi-plus-circle-fill"></i> Add Users
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3"><i class="bi bi-search"></i> Find User</h4>
+                    <form method="get" th:action="@{/search}">
+                        <div class="form-group row">
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group">
+                                    <label for="namaKaryawan" class="form-label">Nama Karyawan</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="namaKaryawan" name="namaKaryawan"
+                                            placeholder="Masukan Nama Karyawan" />
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group">
+                                    <label for="noHp" class="form-label">Nomor HP</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="noHp" name="noHp"
+                                            placeholder="Masukan Nomor HP" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="form-group">
+                                    <label for="date_range">Tanggal Masuk Karyawan</label>
+                                    <div class="input-group">
+                                        <input type="date" class="form-control" name="start_date"
+                                            placeholder="Start date" />
+                                        <input type="date" class="form-control" name="end_date"
+                                            placeholder="End date" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i>
+                                        Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg col-xl mt-3">
+            <div class="card shadow mb-4">
+                <div class="table-responsive">
+                    <div class="card-body" th:if="${not #lists.isEmpty(karyawanList)}">
+                        <table id="userTable" class="table table-bordered">
+                            <thead class="thead-blue">
+                                <tr>
+                                    <th>Kode Karyawan</th>
+                                    <th>Nama Karyawan</th>
+                                    <th>Phone Number</th>
+                                    <th>Entry Date</th>
+                                    <th>Limit Reimbursement</th>
+                                    <th>Created Date</th>
+                                    <th>Updated Date</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="karyawan : ${karyawanList}">
+                                    <td th:text="${karyawan.kodeKaryawan}"></td>
+                                    <td th:text="${karyawan.namaKaryawan}"></td>
+                                    <td th:text="${karyawan.noHp}"></td>
+                                    <td th:text="${#temporals.format(karyawan.tanggalMasukKerja, 'dd-MM-yyyy')}"></td>
+                                    <td th:text="${karyawan.limitReimbursement}"></td>
+                                    <td th:text="${#temporals.format(karyawan.createdDate, 'dd-MM-yyyy')}"></td>
+                                    <td th:text="${#temporals.format(karyawan.updatedDate, 'dd-MM-yyyy')}"></td>
+                                    <td class="text-center">
+                                        <div class="btn-group">
+                                            <a th:href="@{/edit/{kodeKaryawan}(kodeKaryawan=${karyawan.kodeKaryawan})}"
+                                                class="btn btn-sm btn-primary" id="editButton">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <form method="post"
+                                                th:action="@{/delete/{kodeKaryawan}(kodeKaryawan=${karyawan.kodeKaryawan})}"
+                                                th:method="delete" id="deleteForm" onclick="confirmDelete()">
+                                                <button type="submit" class="btn btn-sm btn-danger" id="deleteButton">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            $('#date_range').daterangepicker({
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+        });
+    </script>
+    <script>
+        function confirmDelete() {
+            if (confirm("Are you sure you want to delete this record?")) {
+                document.getElementById("deleteForm").submit();
+            } else {
+                event.preventDefault();
+            }
+        }
+    </script>
+</body>
+
+</html>
